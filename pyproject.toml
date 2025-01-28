@@ -1,5 +1,5 @@
 [project]
-name = "howdoyoufindme_backend"
+name = "howdoyoufindme"
 version = "0.1.0"
 description = "howdoyoufindme-backend using crewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
@@ -9,11 +9,11 @@ dependencies = [
 ]
 
 [project.scripts]
-howdoyoufindme_backend = "howdoyoufindme_backend.main:run"
-run_crew = "howdoyoufindme_backend.main:run"
-train = "howdoyoufindme_backend.main:train"
-replay = "howdoyoufindme_backend.main:replay"
-test = "howdoyoufindme_backend.main:test"
+howdoyoufindme = "howdoyoufindme.main:run"
+run_crew = "howdoyoufindme.main:run"
+train = "howdoyoufindme.main:train"
+replay = "howdoyoufindme.main:replay"
+test = "howdoyoufindme.main:test"
 
 [build-system]
 requires = ["hatchling"]

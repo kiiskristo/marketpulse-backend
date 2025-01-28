@@ -2,7 +2,7 @@
 import sys
 import warnings
 
-from howdoyoufindme_backend.crew import HowdoyoufindmeBackend
+from howdoyoufindme.crew import HowDoYouFindMeCrew
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -16,9 +16,9 @@ def run():
     Run the crew.
     """
     inputs = {
-        'topic': 'AI LLMs'
+        'query': 'Tesla'
     }
-    HowdoyoufindmeBackend().crew().kickoff(inputs=inputs)
+    HowDoYouFindMeCrew().crew().kickoff(inputs=inputs)
 
 
 def train():
@@ -29,7 +29,7 @@ def train():
         "topic": "AI LLMs"
     }
     try:
-        HowdoyoufindmeBackend().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+        HowDoYouFindMeCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
 
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
@@ -39,7 +39,7 @@ def replay():
     Replay the crew execution from a specific task.
     """
     try:
-        HowdoyoufindmeBackend().crew().replay(task_id=sys.argv[1])
+        HowDoYouFindMeCrew().crew().replay(task_id=sys.argv[1])
 
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
@@ -52,7 +52,7 @@ def test():
         "topic": "AI LLMs"
     }
     try:
-        HowdoyoufindmeBackend().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
+        HowDoYouFindMeCrew().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
 
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
