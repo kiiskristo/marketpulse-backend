@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "howdoyoufindme"
 version = "0.1.0"
 description = "HowDoYouFindMe Backend"
+requires-python = ">=3.12"
 dependencies = [
     "crewai",
     "langchain-community>=0.0.10",
