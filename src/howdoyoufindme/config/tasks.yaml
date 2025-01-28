@@ -1,31 +1,37 @@
+# src/howdoyoufindme/config/tasks.yaml
 generate_keywords_task:
   description: >
-    Analyze the company/brand/product name '{query}' and generate:
-    1. A list of 5-10 relevant keywords
-    2. A comprehensive description (2-3 sentences)
+    For the company '{query}':
+    1. Identify their primary industry/category
+    2. List their main competitors in this space
+    3. Generate keywords that define this market segment
+    Format output as dictionary with 'category', 'competitors', and 'keywords' keys.
   expected_output: >
-    A dictionary with 'keywords' and 'description' keys
+    Dictionary containing industry category, main competitors, and relevant keywords
   agent: keyword_agent
 
 build_query_task:
   description: >
-    Using the keywords and description provided:
-    1. Create an optimized Bing search query
-    2. Execute the search using the Bing Search API
+    Using the category and competitor information:
+    1. Create search queries to find industry rankings and market positions
+    2. Search for authoritative sources that rank companies in this space
+    3. Gather competitive positioning data
+    Return both the queries used and the search results.
   expected_output: >
-    Dictionary containing search query and raw results
+    Dictionary with search queries and results focusing on industry rankings
   agent: query_builder_agent
   context:
     - generate_keywords_task
 
 ranking_task:
   description: >
-    Analyze the search results for '{query}':
-    1. Find mentions of the target company/brand/product
-    2. Score each result based on relevance (0-100)
-    3. Generate a ranked list of the top matches
+    Analyze where '{query}' ranks in their industry:
+    1. Review search results for rankings and market position
+    2. Compare against identified competitors
+    3. Determine their position (e.g., "ranks #5 in online hearing aid providers")
+    4. Include context about market leaders and competitive position
   expected_output: >
-    List of dictionaries with 'title' and 'score' keys
+    Dictionary with ranking position, market context, and comparison to leaders
   agent: ranking_agent
   context:
     - build_query_task

@@ -12,14 +12,13 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 # interpolate any tasks and agents information
 
 def run():
-    """
-    Run the crew.
-    """
+    """Run the crew."""
     inputs = {
-        'query': 'Tesla'
+        "query": input("Enter company/brand name to analyze: ")
     }
-    HowDoYouFindMeCrew().crew().kickoff(inputs=inputs)
-
+    result = HowDoYouFindMeCrew().crew().kickoff(inputs=inputs)
+    print("\nAnalysis Results:")
+    print(result)
 
 def train():
     """

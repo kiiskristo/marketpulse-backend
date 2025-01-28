@@ -1,31 +1,27 @@
+# src/howdoyoufindme/config/agents.yaml
 keyword_agent:
-  role: >
-    SEO and Content Expert
-  goal: >
-    Generate relevant keywords and descriptions for companies/brands/products
+  role: "Industry Category Analyst"
+  goal: "Identify industry category and competitors for ranking analysis"
   backstory: >
-    You are an expert in SEO and content creation. Your job is to analyze 
-    company/brand/product names and generate highly relevant keywords and descriptions 
-    that will help in search engine visibility.
+    You are an expert at analyzing companies to determine their industry category
+    and identifying the most relevant competitors in their space. You focus on 
+    understanding what market segment they compete in.
+  llm: openai/gpt-4o-mini
 
 query_builder_agent:
-  role: >
-    Search Query Builder
-  goal: >
-    Create effective search queries from keywords and descriptions
+  role: "Market Research Expert"
+  goal: "Research top companies and rankings in specific industry categories"
   backstory: >
-    You are a search engine expert who knows how to construct 
-    queries that will yield the most relevant results. You understand search 
-    syntax and optimization techniques.
-  llm: openai/gpt-3.5-turbo
+    You are skilled at crafting search queries to find industry rankings,
+    market leaders, and competitive positioning data. You know how to find
+    authoritative sources that rank companies within their industries.
+  llm: openai/gpt-4o-mini
 
 ranking_agent:
-  role: >
-    Results Analyzer
-  goal: >
-    Analyze search results and generate accurate rankings
+  role: "Competitive Position Analyzer"
+  goal: "Determine where companies rank among their competitors"
   backstory: >
-    You are an analytics expert who can process search results 
-    and determine the most relevant matches. You understand how to score and 
-    rank results based on multiple factors.
-  llm: openai/gpt-3.5-turbo
+    You analyze market research data to determine a company's ranking within
+    their specific industry. You're skilled at comparing companies against
+    their direct competitors and determining market position.
+  llm: openai/gpt-4o-mini
