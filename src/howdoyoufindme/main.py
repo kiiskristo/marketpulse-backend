@@ -1,57 +1,40 @@
-#!/usr/bin/env python
-import sys
+# src/howdoyoufindme/main.py
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from .crew import HowDoYouFindMeCrew
 import warnings
-
-from howdoyoufindme.crew import HowDoYouFindMeCrew
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+app = FastAPI()
 
-def run():
-    """Run the crew."""
-    inputs = {
-        "query": input("Enter company/brand name to analyze: ")
-    }
-    result = HowDoYouFindMeCrew().crew().kickoff(inputs=inputs)
-    print("\nAnalysis Results:")
-    print(result)
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "https://kiiskristo.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs"
-    }
+class SearchRequest(BaseModel):
+    query: str
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
+@app.post("/api/search-rank")
+async def search_rank(request: SearchRequest):
     try:
-        HowDoYouFindMeCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
+        crew = HowDoYouFindMeCrew()
+        result = crew.crew().kickoff(inputs={'query': request.query})
+        return result
     except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        HowDoYouFindMeCrew().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs"
-    }
-    try:
-        HowDoYouFindMeCrew().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+# Keep the CLI functions but move them to a separate file
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
