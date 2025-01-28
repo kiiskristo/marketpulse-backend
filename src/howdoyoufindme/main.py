@@ -1,11 +1,7 @@
-# src/howdoyoufindme/main.py
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .crew import HowDoYouFindMeCrew
-import warnings
-
-warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 app = FastAPI()
 
@@ -33,10 +29,3 @@ async def search_rank(request: SearchRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# Keep the CLI functions but move them to a separate file
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    port = int(os.getenv("PORT", "8080"))
-    uvicorn.run("src.howdoyoufindme.main:app", host="0.0.0.0", port=port, reload=True)

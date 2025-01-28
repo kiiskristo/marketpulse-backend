@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
 
-CMD ["python", "-m", "src.howdoyoufindme.main"]
+CMD uvicorn src.howdoyoufindme.main:app --host 0.0.0.0 --port=${PORT:-8080}
