@@ -1,23 +1,21 @@
-[project]
-name = "howdoyoufindme"
-version = "0.1.0"
-description = "howdoyoufindme-backend using crewAI"
-authors = [{ name = "Your Name", email = "you@example.com" }]
-requires-python = ">=3.10,<3.13"
-dependencies = [
-    "crewai[tools]>=0.95.0,<1.0.0"
-]
-
-[project.scripts]
-howdoyoufindme = "howdoyoufindme.main:run"
-run_crew = "howdoyoufindme.main:run"
-train = "howdoyoufindme.main:train"
-replay = "howdoyoufindme.main:replay"
-test = "howdoyoufindme.main:test"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.crewai]
-type = "crew"
+[project]
+name = "howdoyoufindme"
+version = "0.1.0"
+description = "HowDoYouFindMe Backend"
+dependencies = [
+    "crewai",
+    "langchain-community>=0.0.10",
+    "langchain-openai>=0.0.2",
+    "langchain-core>=0.1.4",
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.2"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/howdoyoufindme"]
