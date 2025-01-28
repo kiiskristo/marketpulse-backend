@@ -2,7 +2,7 @@
 import sys
 import warnings
 
-from howdoyoufindme.crew import HowDoYouFindMeCrew
+from .crew import HowDoYouFindMeCrew
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
