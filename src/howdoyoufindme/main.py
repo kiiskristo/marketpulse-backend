@@ -37,4 +37,6 @@ async def search_rank(request: SearchRequest):
 # Keep the CLI functions but move them to a separate file
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    import os
+    port = int(os.getenv("PORT", "8080"))
+    uvicorn.run("src.howdoyoufindme.main:app", host="0.0.0.0", port=port, reload=True)
