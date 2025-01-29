@@ -43,7 +43,7 @@ class HowDoYouFindMeCrew:
     def ranking_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['ranking_agent'],
-            llm_config={"temperature": 0.7, "model": "gpt-4o-mini"},
+            llm_config={"temperature": 0.0, "model": "gpt-4o-mini"},
             verbose=True
         )
 
