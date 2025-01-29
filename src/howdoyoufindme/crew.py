@@ -26,7 +26,7 @@ class HowDoYouFindMeCrew:
     def keyword_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['keyword_agent'],
-            llm_config={"temperature": 0.7, "model": "gpt-4o-mini"},
+            llm_config={"temperature": 0.7, "model": "o1-mini"},
             verbose=True
         )
 
@@ -35,7 +35,7 @@ class HowDoYouFindMeCrew:
         return Agent(
             config=self.agents_config['query_builder_agent'],
             tools=[self.search_tool],
-            llm_config={"temperature": 0.7, "model": "gpt-4o-mini"},
+            llm_config={"temperature": 0.7, "model": "o1-mini"},
             verbose=True
         )
 
@@ -43,7 +43,7 @@ class HowDoYouFindMeCrew:
     def ranking_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['ranking_agent'],
-            llm_config={"temperature": 0.0, "model": "gpt-4o-mini"},
+            llm_config={"temperature": 0.0, "model": "o1-mini"},
             verbose=True
         )
 
