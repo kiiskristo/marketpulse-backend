@@ -38,20 +38,20 @@ ranking_task:
     - Ensure your JSON is valid with double quotes around all strings,
       and no trailing commas.
 
-    - Use this exact schema (with escaped braces so CrewAI won't parse them):
-      \{
+    - Use this exact schema (parentheses instead of braces):
+      (
         "ranking_position": "string",
         "market_context": "string or object describing the market context",
-        "comparison_to_leaders": \{
+        "comparison_to_leaders": (
           "top_competitors": [
-            \{
+            (
               "company": "string",
               "market_share": "string"
-            \}
+            )
           ],
           "competition_analysis": "string"
-        \}
-      \}
+        )
+      )
 
   expected_output: >
     Dictionary with ranking position, market context, and comparison to leaders
