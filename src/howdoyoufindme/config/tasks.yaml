@@ -1,4 +1,5 @@
 # src/howdoyoufindme/config/tasks.yaml
+
 generate_keywords_task:
   description: >
     For the company '{query}':
@@ -32,24 +33,26 @@ ranking_task:
     4. Include context about market leaders and competitive position
 
     IMPORTANT:
-    - Return **valid JSON ONLY** (no markdown, code fences, or extra text).
-    - **Do not** include "```" in your output.
-    - Ensure your JSON is valid with **double quotes** around all strings, 
+    - Return valid JSON ONLY (no markdown, code fences, or extra text).
+    - Do not include "```" in your output.
+    - Ensure your JSON is valid with double quotes around all strings,
       and no trailing commas.
-    - Use this exact schema (no extra fields):
-      {
+
+    - Use this exact schema (with escaped braces so CrewAI won't parse them):
+      \{
         "ranking_position": "string",
-        "market_context": "string or object describing market context",
-        "comparison_to_leaders": {
+        "market_context": "string or object describing the market context",
+        "comparison_to_leaders": \{
           "top_competitors": [
-            {
+            \{
               "company": "string",
               "market_share": "string"
-            }
+            \}
           ],
           "competition_analysis": "string"
-        }
-      }
+        \}
+      \}
+
   expected_output: >
     Dictionary with ranking position, market context, and comparison to leaders
   agent: ranking_agent
