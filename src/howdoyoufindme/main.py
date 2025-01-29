@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .crew import HowDoYouFindMeCrew
 from .clean_json import clean_and_parse_json
+from typing import Dict, Any, Optional
 
 app = FastAPI()
 
@@ -18,6 +19,9 @@ app.add_middleware(
 class SearchRequest(BaseModel):
     query: str
 
+class SearchResponse(BaseModel):
+    tasks_output: list[Dict[str, Any]]
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
@@ -28,6 +32,10 @@ async def search_rank(request: SearchRequest):
         # 1) Run the pipeline
         crew_instance = HowDoYouFindMeCrew()
         result = crew_instance.crew().kickoff(inputs={'query': request.query})
+        
+        # Convert result to dict if it's not already
+        if not isinstance(result, dict):
+            result = vars(result)
 
         # 2) Clean/parse 'raw' JSON in each task result
         for task_output in result.get("tasks_output", []):
@@ -38,7 +46,7 @@ async def search_rank(request: SearchRequest):
                 except ValueError as e:
                     task_output["parse_error"] = str(e)
                     task_output["parsed"] = None
-        
+
         # 3) Return the entire result (including "parsed" data)
         return result
 
