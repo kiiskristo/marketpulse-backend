@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from howdoyoufindme.crew import HowDoYouFindMeCrew
+from crewai import Crew
 
 
 @pytest.fixture
@@ -56,3 +57,13 @@ async def test_crew_tasks(mock_bing_wrapper):
     ranking_task = crew.ranking_task()
     assert ranking_task is not None
     assert "ranking" in str(ranking_task).lower()
+    
+    
+@pytest.mark.asyncio
+async def test_crew_method():
+    howdy_crew = HowDoYouFindMeCrew()
+    my_crew = howdy_crew.crew()  # <-- Invokes the @crew method
+    assert isinstance(my_crew, Crew)
+    # Optionally verify other fields:
+    assert my_crew.process.name == "sequential"
+    assert my_crew.verbose is True
