@@ -1,3 +1,5 @@
+# tests/test_clean_json.py
+
 import pytest
 from howdoyoufindme.clean_json import clean_and_parse_json, extract_json_string
 
@@ -29,4 +31,4 @@ def test_clean_and_parse_json_decode_error():
     invalid_json_str = "{invalid: true,,}"
     with pytest.raises(ValueError) as exc_info:
         clean_and_parse_json(invalid_json_str)
-    assert "Failed to parse JSON:" in str(exc_info.value)
+    assert "Failed to parse JSON after cleaning" in str(exc_info.value)

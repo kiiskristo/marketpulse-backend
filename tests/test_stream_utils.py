@@ -1,9 +1,10 @@
+# tests/test_stream_utils.py
+
 import json
 
 import pytest
 
-from howdoyoufindme.utils.stream_utils import (create_stream_event,
-                                               process_task_result)
+from howdoyoufindme.utils.stream_utils import create_stream_event, process_task_result
 
 
 @pytest.mark.asyncio
@@ -40,4 +41,4 @@ async def test_process_task_result_invalid_json():
     event = await process_task_result("keywords", invalid_json)
     parsed = json.loads(event.strip())
     assert parsed["type"] == "error"
-    assert "Error processing keywords result" in parsed["message"]
+    assert "Failed to process keywords output" in parsed["message"]
