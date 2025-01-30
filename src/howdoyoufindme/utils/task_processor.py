@@ -38,23 +38,29 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
 
         # Process each task output in sequence
         if hasattr(crew_result, 'tasks_output'):
-            for task_output in crew_result.tasks_output:
-                # Send status update for task
-                event = await create_stream_event(
-                    event_type="status",
-                    message=f"Processing {task_output.summary}..."
-                )
-                async for msg in yield_event(event):
-                    yield msg
-
-                # Send task result
-                if hasattr(task_output, 'raw'):
-                    event = await process_task_result(
-                        task_output.task_id, 
-                        task_output.raw
+            tasks_info = {
+                0: ("keywords", "Analyzing keywords..."),
+                1: ("queries", "Building search queries..."),
+                2: ("ranking", "Analyzing ranking...")
+            }
+            
+            for idx, task_output in enumerate(crew_result.tasks_output):
+                if idx in tasks_info:
+                    task_id, status_msg = tasks_info[idx]
+                    
+                    # Send status update
+                    event = await create_stream_event(
+                        event_type="status",
+                        message=status_msg
                     )
                     async for msg in yield_event(event):
                         yield msg
+
+                    # Send task result
+                    if hasattr(task_output, 'raw'):
+                        event = await process_task_result(task_id, task_output.raw)
+                        async for msg in yield_event(event):
+                            yield msg
 
         # Complete
         event = await create_stream_event(

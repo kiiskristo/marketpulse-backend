@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
 from .utils.task_processor import stream_results
 
 app = FastAPI()
@@ -9,9 +8,9 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://howyoufind.me"],
+    allow_origins=["https://howyoufind.me", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Type", "text/event-stream"]
 )
@@ -23,13 +22,11 @@ async def health_check():
 
 @app.get("/api/search-rank/stream")
 async def search_rank_stream(query: str):
-    """Stream search ranking results"""
     return StreamingResponse(
         stream_results(query),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no"  # Important for Nginx
+            "Connection": "keep-alive"
         }
     )
