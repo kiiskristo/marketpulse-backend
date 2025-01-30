@@ -1,7 +1,7 @@
 # src/howdoyoufindme/utils/stream_utils.py
 
 import json
-from typing import AsyncGenerator, Any, Dict
+from typing import Any, Dict
 from ..clean_json import clean_and_parse_json
 
 

@@ -32,3 +32,20 @@ asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore::DeprecationWarning:litellm.*:",
 ]
+
+[tool.coverage.run]
+source = ["howdoyoufindme"]
+omit = [
+    "src/howdoyoufindme/cli.py",
+    "*/__init__.py",
+    "tests/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass"
+]

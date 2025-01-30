@@ -21,17 +21,18 @@ class MarketSearchTool(BaseTool):
         "business and market intelligence."
     )
     args_schema: Type[BaseModel] = SearchToolInput
+    bing_search: BingSearchAPIWrapper = None
 
     def __init__(self):
         super().__init__()
-        self.bing = BingSearchAPIWrapper(
+        self.bing_search = BingSearchAPIWrapper(
             bing_subscription_key=os.getenv('BING_SUBSCRIPTION_KEY'),
             bing_search_url="https://api.bing.microsoft.com/v7.0/search"
         )
 
     def _run(self, query: str) -> str:
         try:
-            results = self.bing.run(query)
+            results = self.bing_search.run(query)
             return results
         except Exception as e:
             return f"Error performing search: {str(e)}"
