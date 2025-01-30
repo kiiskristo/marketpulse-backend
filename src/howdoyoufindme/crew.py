@@ -1,9 +1,6 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from langchain_community.utilities import BingSearchAPIWrapper
-from langchain_openai import ChatOpenAI
-from langchain.tools import Tool
-import os
+from .tools.search_tool import MarketSearchTool
 from dotenv import load_dotenv
 
 @CrewBase
@@ -12,15 +9,7 @@ class HowDoYouFindMeCrew:
 
     def __init__(self):
         load_dotenv()
-        self.bing = BingSearchAPIWrapper(
-            bing_subscription_key=os.getenv('BING_SUBSCRIPTION_KEY'),
-            bing_search_url="https://api.bing.microsoft.com/v7.0/search"
-        )
-        self.search_tool = Tool(
-            name="web_search",
-            description="Search the web for information about companies and products",
-            func=self.bing.run
-        )
+        self.search_tool = MarketSearchTool()
 
     @agent
     def keyword_agent(self) -> Agent:
