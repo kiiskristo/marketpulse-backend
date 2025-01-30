@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      BING_SUBSCRIPTION_KEY: "fake-key-for-tests"
     steps:
     - uses: actions/checkout@v4
     
