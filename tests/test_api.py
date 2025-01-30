@@ -1,3 +1,5 @@
+# tests/test_api.py
+
 import json
 from unittest.mock import patch
 
@@ -12,7 +14,7 @@ def test_health_check(test_client):
 
 @pytest.mark.asyncio
 async def test_search_rank_stream(
-    test_client, mock_crew, sample_keyword_response, sample_ranking_response
+    test_client, sample_keyword_response, sample_ranking_response
 ):
     # Mock the streaming response
     async def mock_stream():
@@ -30,7 +32,6 @@ async def test_search_rank_stream(
 
     with patch("howdoyoufindme.main.stream_results", return_value=mock_stream()):
         response = test_client.get("/api/search-rank/stream?query=testc%20ompany")
-
 
         assert response.status_code == 200
         assert response.headers["content-type"].startswith("text/event-stream")

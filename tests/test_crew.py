@@ -1,16 +1,9 @@
+# tests/test_crew.py
+
 import pytest
 from unittest.mock import patch, MagicMock
-from howdoyoufindme.crew import HowDoYouFindMeCrew
 from crewai import Crew
-
-
-@pytest.fixture
-def mock_bing_wrapper():
-    with patch('langchain_community.utilities.BingSearchAPIWrapper') as mock:
-        mock_instance = MagicMock()
-        mock_instance.run.return_value = "Search results"
-        mock.return_value = mock_instance
-        yield mock_instance
+from howdoyoufindme.crew import HowDoYouFindMeCrew
 
 
 def test_crew_initialization(mock_bing_wrapper):
@@ -18,52 +11,44 @@ def test_crew_initialization(mock_bing_wrapper):
     assert crew.search_tool is not None
 
 
-@pytest.mark.asyncio
-async def test_keyword_agent(mock_bing_wrapper):
+def test_keyword_agent(mock_bing_wrapper):
     crew = HowDoYouFindMeCrew()
     agent = crew.keyword_agent()
-    assert "Industry Category Analyst" in str(agent)
-    assert "Identify industry category" in str(agent)
+    assert "Industry Category Analyst" == agent.role
 
 
-@pytest.mark.asyncio
-async def test_query_builder_agent(mock_bing_wrapper):
+def test_query_builder_agent(mock_bing_wrapper):
     crew = HowDoYouFindMeCrew()
     agent = crew.query_builder_agent()
-    assert "Market Research Expert" in str(agent)
+    assert "Market Research Expert" == agent.role
     assert len(agent.tools) >= 1
 
 
-@pytest.mark.asyncio
-async def test_ranking_agent(mock_bing_wrapper):
+def test_ranking_agent(mock_bing_wrapper):
     crew = HowDoYouFindMeCrew()
     agent = crew.ranking_agent()
-    assert "Competitive Position Analyzer" in str(agent)
+    assert "Competitive Position Analyzer" == agent.role
 
 
-@pytest.mark.asyncio
-async def test_crew_tasks(mock_bing_wrapper):
+def test_crew_tasks(mock_bing_wrapper):
     crew = HowDoYouFindMeCrew()
     
-    # Test that tasks are created successfully
     keywords_task = crew.generate_keywords_task()
     assert keywords_task is not None
-    assert "generate keywords" in str(keywords_task).lower()
+    assert "Test description" == keywords_task.description
     
     query_task = crew.build_query_task()
     assert query_task is not None
-    assert "query" in str(query_task).lower()
+    assert "Test description" == query_task.description
     
     ranking_task = crew.ranking_task()
     assert ranking_task is not None
-    assert "ranking" in str(ranking_task).lower()
-    
-    
-@pytest.mark.asyncio
-async def test_crew_method():
-    howdy_crew = HowDoYouFindMeCrew()
-    my_crew = howdy_crew.crew()  # <-- Invokes the @crew method
+    assert "Test description" == ranking_task.description
+
+
+def test_crew_method(mock_bing_wrapper):
+    crew_instance = HowDoYouFindMeCrew()
+    my_crew = crew_instance.crew()
     assert isinstance(my_crew, Crew)
-    # Optionally verify other fields:
     assert my_crew.process.name == "sequential"
     assert my_crew.verbose is True

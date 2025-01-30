@@ -2,27 +2,31 @@
 
 generate_keywords_task:
   description: >
-    For the company '{query}':
+    For the company or website '{query}':
     1. Identify their primary industry/category
     2. List their main competitors in this space
     3. Generate keywords that define this market segment
-    Format output as dictionary with 'category', 'competitors', and 'keywords' keys.
   expected_output: >
-    Dictionary containing industry category, main competitors, and relevant keywords
+    {
+      "category": "Industry category",
+      "competitors": ["List of main competitors"],
+      "keywords": ["List of relevant keywords"]
+    }
   agent: keyword_agent
 
 build_query_task:
   description: >
-    Using the category and competitor information:
+    Use the category and competitor information to:
     1. Create search queries to find industry rankings and market positions
     2. Search for authoritative sources that rank companies in this space
     3. Gather competitive positioning data
-    Return both the queries used and the search results.
   expected_output: >
-    Dictionary with search queries and results focusing on industry rankings
+    {
+      "queries": ["List of search queries used"],
+      "results": ["List of search results and findings"]
+    }
   agent: query_builder_agent
-  context:
-    - generate_keywords_task
+  context: [generate_keywords_task]
 
 ranking_task:
   description: >
@@ -31,30 +35,23 @@ ranking_task:
     2. Compare against identified competitors
     3. Determine their position (e.g., "ranks #5 in online hearing aid providers")
     4. Include context about market leaders and competitive position
-
-    IMPORTANT:
-    - Return valid JSON ONLY (no markdown, code fences, or extra text).
-    - Do not include "```" in your output.
-    - Ensure your JSON is valid with double quotes around all strings,
-      and no trailing commas.
-
-    - Use this exact schema (parentheses instead of braces):
-      (
-        "ranking_position": "string",
-        "market_context": "string or object describing the market context",
-        "comparison_to_leaders": (
-          "top_competitors": [
-            (
-              "company": "string",
-              "market_share": "string"
-            )
-          ],
-          "competition_analysis": "string"
-        )
-      )
-
   expected_output: >
-    Dictionary with ranking position, market context, and comparison to leaders
+    {
+      "ranking_position": "Clear ranking statement",
+      "market_context": {
+        "market_size": "Total market size",
+        "growth_projections": "Growth projections"
+      },
+      "comparison_to_leaders": {
+        "top_competitors": [
+          {
+            "company": "Competitor name",
+            "rank": "Numeric rank",
+            "market_share": "Market share percentage"
+          }
+        ],
+        "summary": "Competitive analysis summary"
+      }
+    }
   agent: ranking_agent
-  context:
-    - build_query_task
+  context: [build_query_task]
