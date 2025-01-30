@@ -29,9 +29,8 @@ async def test_search_rank_stream(
         yield b'{"type":"complete","message":"Analysis complete"}\n'
 
     with patch("howdoyoufindme.main.stream_results", return_value=mock_stream()):
-        response = test_client.post(
-            "/api/search-rank/stream", json={"query": "test company"}
-        )
+        response = test_client.get("/api/search-rank/stream?query=testc%20ompany")
+
 
         assert response.status_code == 200
         assert response.headers["content-type"].startswith("text/event-stream")

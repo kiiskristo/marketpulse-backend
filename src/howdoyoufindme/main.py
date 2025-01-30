@@ -15,19 +15,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class SearchRequest(BaseModel):
-    query: str
-
-
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
 
 @app.get("/api/search-rank/stream")
-async def search_rank_stream(request: SearchRequest):
+async def search_rank_stream(query: str):  # ✅ Accept query as a query parameter
     """Stream search ranking results"""
     return StreamingResponse(
-        stream_results(request.query), media_type="text/event-stream"
+        stream_results(query), media_type="text/event-stream"
     )
