@@ -1,6 +1,6 @@
 # src/howdoyoufindme/utils/task_processor.py
 
-from typing import AsyncGenerator, Union
+from typing import AsyncGenerator
 
 from ..crew import HowDoYouFindMeCrew
 from .stream_utils import create_stream_event, process_task_result
@@ -12,12 +12,7 @@ async def format_sse(data: str) -> str:
 
 
 async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenerator[str, None]:
-    """Process tasks and stream results
-    
-    Args:
-        query: Search query string
-        use_sse_format: Whether to format output as SSE events (default: True)
-    """
+    """Process tasks and stream results"""
     try:
         crew_instance = HowDoYouFindMeCrew()
 
@@ -43,7 +38,7 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
             yield msg
             
         keywords_task = crew_instance.generate_keywords_task()
-        keywords_result = await keywords_task.run_async({"query": query})
+        keywords_result = keywords_task.run({"query": query})  # Using synchronous run()
         event = await process_task_result("keywords", keywords_result.raw)
         async for msg in yield_event(event):
             yield msg
@@ -56,7 +51,7 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
             yield msg
             
         query_task = crew_instance.build_query_task()
-        query_result = await query_task.run_async({"query": query})
+        query_result = query_task.run({"query": query})  # Using synchronous run()
 
         # Ranking task
         event = await create_stream_event(
@@ -66,7 +61,7 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
             yield msg
             
         ranking_task = crew_instance.ranking_task()
-        ranking_result = await ranking_task.run_async({"query": query})
+        ranking_result = ranking_task.run({"query": query})  # Using synchronous run()
         event = await process_task_result("ranking", ranking_result.raw)
         async for msg in yield_event(event):
             yield msg
@@ -79,6 +74,9 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
             yield msg
 
     except Exception as e:
-        event = await create_stream_event(event_type="error", message=str(e))
+        event = await create_stream_event(
+            event_type="error", 
+            message=f"Error during analysis: {str(e)}"
+        )
         async for msg in yield_event(event):
             yield msg
