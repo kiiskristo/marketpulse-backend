@@ -1,6 +1,7 @@
 # HowdoyoufindmeBackend Crew
 
-[![Tests](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/test.yml/badge.svg)](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/test.yml)
+[![Tests](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/main.yml/badge.svg)](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/main.yml)
+
 [![codecov](https://codecov.io/gh/kiiskristo/howdoyoufindme-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/kiiskristo/howdoyoufindme-backend)
 
 Welcome to the HowdoyoufindmeBackend Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
