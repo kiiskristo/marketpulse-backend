@@ -1,5 +1,5 @@
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -10,28 +10,23 @@ from howdoyoufindme.utils.task_processor import stream_results
 async def test_stream_results_success(
     mock_crew, sample_keyword_response, sample_ranking_response
 ):
-    # Mock the task results
-    keywords_task_mock = MagicMock()
-    keywords_task_mock.run = MagicMock(
-        return_value=MagicMock(raw=json.dumps(sample_keyword_response))
-    )
-
-    query_task_mock = MagicMock()
-    query_task_mock.run = MagicMock(
-        return_value=MagicMock(raw=json.dumps({"queries": ["test query"]}))
-    )
-
-    ranking_task_mock = MagicMock()
-    ranking_task_mock.run = MagicMock(
-        return_value=MagicMock(raw=json.dumps(sample_ranking_response))
-    )
-
-    mock_crew.generate_keywords_task.return_value = keywords_task_mock
-    mock_crew.build_query_task.return_value = query_task_mock
-    mock_crew.ranking_task.return_value = ranking_task_mock
+    # Mock the crew execution
+    mock_crew_instance = MagicMock()
+    mock_crew_execution = MagicMock()
+    
+    # Setup the mock crew execution results
+    mock_crew_execution.execute_task = MagicMock(side_effect=[
+        MagicMock(raw=json.dumps(sample_keyword_response)),  # keywords task
+        MagicMock(raw=json.dumps({"queries": ["test query"]})),  # query task
+        MagicMock(raw=json.dumps(sample_ranking_response))  # ranking task
+    ])
+    
+    # Setup the crew instance to return our mock execution
+    mock_crew_instance.crew.return_value = mock_crew_execution
 
     with patch(
-        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew", return_value=mock_crew
+        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew",
+        return_value=mock_crew_instance
     ):
         events = []
         async for event in stream_results("test company", use_sse_format=False):
@@ -52,18 +47,19 @@ async def test_stream_results_success(
 
 @pytest.mark.asyncio
 async def test_stream_results_error():
-    # Create a mock crew instance
-    mock_crew = MagicMock()
-
-    # Create a mock task that raises an exception
-    error_task = MagicMock()
-    error_task.run = MagicMock(side_effect=Exception("Test error"))
-
-    # Set up the mock crew to return our error task
-    mock_crew.generate_keywords_task = MagicMock(return_value=error_task)
+    # Mock crew instance and execution
+    mock_crew_instance = MagicMock()
+    mock_crew_execution = MagicMock()
+    
+    # Setup error
+    mock_crew_execution.execute_task = MagicMock(
+        side_effect=Exception("Test error")
+    )
+    mock_crew_instance.crew.return_value = mock_crew_execution
 
     with patch(
-        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew", return_value=mock_crew
+        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew",
+        return_value=mock_crew_instance
     ):
         events = []
         async for event in stream_results("test company", use_sse_format=False):
@@ -78,13 +74,19 @@ async def test_stream_results_error():
 @pytest.mark.asyncio
 async def test_stream_results_sse_format():
     """Test that SSE formatting is applied correctly when enabled"""
-    mock_crew = MagicMock()
-    error_task = MagicMock()
-    error_task.run = MagicMock(side_effect=Exception("Test error"))
-    mock_crew.generate_keywords_task = MagicMock(return_value=error_task)
+    # Mock crew instance and execution
+    mock_crew_instance = MagicMock()
+    mock_crew_execution = MagicMock()
+    
+    # Setup error
+    mock_crew_execution.execute_task = MagicMock(
+        side_effect=Exception("Test error")
+    )
+    mock_crew_instance.crew.return_value = mock_crew_execution
 
     with patch(
-        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew", return_value=mock_crew
+        "howdoyoufindme.utils.task_processor.HowDoYouFindMeCrew",
+        return_value=mock_crew_instance
     ):
         events = []
         async for event in stream_results("test company", use_sse_format=True):
