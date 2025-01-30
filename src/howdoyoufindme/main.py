@@ -11,8 +11,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://howyoufind.me"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["Content-Type", "text/event-stream"]
 )
 
 @app.get("/health")
@@ -21,8 +22,14 @@ async def health_check():
 
 
 @app.get("/api/search-rank/stream")
-async def search_rank_stream(query: str):  # ✅ Accept query as a query parameter
+async def search_rank_stream(query: str):
     """Stream search ranking results"""
     return StreamingResponse(
-        stream_results(query), media_type="text/event-stream"
+        stream_results(query),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"  # Important for Nginx
+        }
     )

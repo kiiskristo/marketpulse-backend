@@ -1,48 +1,84 @@
 # src/howdoyoufindme/utils/task_processor.py
 
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Union
 
 from ..crew import HowDoYouFindMeCrew
 from .stream_utils import create_stream_event, process_task_result
 
 
-async def stream_results(query: str) -> AsyncGenerator[str, None]:
-    """Process tasks and stream results"""
+async def format_sse(data: str) -> str:
+    """Format string as SSE data"""
+    return f"data: {data}\n\n"
+
+
+async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenerator[str, None]:
+    """Process tasks and stream results
+    
+    Args:
+        query: Search query string
+        use_sse_format: Whether to format output as SSE events (default: True)
+    """
     try:
         crew_instance = HowDoYouFindMeCrew()
 
+        # Helper to conditionally format as SSE
+        async def yield_event(event_str: str):
+            if use_sse_format:
+                yield await format_sse(event_str)
+            else:
+                yield event_str
+
         # Initial status
-        yield await create_stream_event(
+        event = await create_stream_event(
             event_type="status", message="Starting analysis..."
         )
+        async for msg in yield_event(event):
+            yield msg
 
         # Keywords task
-        yield await create_stream_event(
+        event = await create_stream_event(
             event_type="status", message="Analyzing industry and competitors..."
         )
+        async for msg in yield_event(event):
+            yield msg
+            
         keywords_task = crew_instance.generate_keywords_task()
         keywords_result = await keywords_task.run_async({"query": query})
-        yield await process_task_result("keywords", keywords_result.raw)
+        event = await process_task_result("keywords", keywords_result.raw)
+        async for msg in yield_event(event):
+            yield msg
 
         # Query task
-        yield await create_stream_event(
+        event = await create_stream_event(
             event_type="status", message="Researching market position..."
         )
+        async for msg in yield_event(event):
+            yield msg
+            
         query_task = crew_instance.build_query_task()
         query_result = await query_task.run_async({"query": query})
 
         # Ranking task
-        yield await create_stream_event(
+        event = await create_stream_event(
             event_type="status", message="Analyzing competitive ranking..."
         )
+        async for msg in yield_event(event):
+            yield msg
+            
         ranking_task = crew_instance.ranking_task()
         ranking_result = await ranking_task.run_async({"query": query})
-        yield await process_task_result("ranking", ranking_result.raw)
+        event = await process_task_result("ranking", ranking_result.raw)
+        async for msg in yield_event(event):
+            yield msg
 
         # Complete
-        yield await create_stream_event(
+        event = await create_stream_event(
             event_type="complete", message="Analysis complete"
         )
+        async for msg in yield_event(event):
+            yield msg
 
     except Exception as e:
-        yield await create_stream_event(event_type="error", message=str(e))
+        event = await create_stream_event(event_type="error", message=str(e))
+        async for msg in yield_event(event):
+            yield msg
