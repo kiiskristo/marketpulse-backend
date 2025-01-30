@@ -27,7 +27,13 @@ jobs:
         
     - name: Run tests with coverage
       run: |
-        pytest --cov=howdoyoufindme --cov-report=term-missing
+        pytest --cov=howdoyoufindme --cov-report=xml
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: kiiskristo/howdoyoufindme-backend
 
   deploy:
     needs: test
