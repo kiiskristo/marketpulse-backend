@@ -18,5 +18,17 @@ dependencies = [
     "pydantic>=2.5.2"
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/howdoyoufindme"]
+[tool.pytest.ini_options]
+addopts = "-v"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+markers = [
+    "asyncio: mark test as async",
+]
+# Add this line:
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::DeprecationWarning:litellm.*:",
+]

@@ -1,3 +1,4 @@
+# Core dependencies
 crewai
 langchain-community>=0.0.10
 langchain-openai>=0.0.2
@@ -6,3 +7,25 @@ fastapi>=0.104.1
 uvicorn>=0.24.0
 python-dotenv>=1.0.0
 pydantic>=2.5.2
+
+# HTTP client for FastAPI
+httpx>=0.24.1
+
+# CORS middleware
+fastapi-cors>=0.0.6
+
+# JSON processing
+orjson>=3.9.10
+
+# Async support
+aiohttp>=3.9.1
+
+# Production server
+gunicorn>=21.2.0
+uvicorn[standard]>=0.24.0
+
+# Required for BingSearchAPIWrapper
+requests>=2.31.0
+
+# Logging
+loguru>=0.7.2
