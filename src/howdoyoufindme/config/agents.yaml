@@ -6,7 +6,7 @@ keyword_agent:
     You are an expert at analyzing companies to determine their industry category
     and identifying the most relevant competitors in their space. You focus on 
     understanding what market segment they compete in.
-  llm: openai/o3-mini
+  llm: openai/gpt-4o-mini
 
 query_builder_agent:
   role: "Market Research Expert"
@@ -15,7 +15,7 @@ query_builder_agent:
     You are skilled at crafting search queries to find industry rankings,
     market leaders, and competitive positioning data. You know how to find
     authoritative sources that rank companies within their industries.
-  llm: openai/o3-mini
+  llm: openai/gpt-4o-mini
 
 ranking_agent:
   role: "Competitive Position Analyzer"
@@ -24,4 +24,4 @@ ranking_agent:
     You analyze market research data to determine a company's ranking within
     their specific industry. You're skilled at comparing companies against
     their direct competitors and determining market position.
-  llm: openai/o3-mini
+  llm: openai/gpt-4o-mini
