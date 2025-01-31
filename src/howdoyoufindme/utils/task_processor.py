@@ -17,6 +17,7 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
     try:
         # Create crew instance
         crew_instance = HowDoYouFindMeCrew()
+        my_crew = crew_instance.crew()
 
         # Helper to conditionally format as SSE
         async def yield_event(event_str: str):
@@ -31,51 +32,58 @@ async def stream_results(query: str, use_sse_format: bool = True) -> AsyncGenera
         )
         async for msg in yield_event(event):
             yield msg
-            await asyncio.sleep(0)  # Allow other tasks to run
+            await asyncio.sleep(0.1)  # Small delay for streaming
 
-        # Create crew
-        my_crew = crew_instance.crew()
-
-        # Status update before keywords
+        # Create and run crew
         event = await create_stream_event(
             event_type="status", message="Analyzing keywords..."
         )
         async for msg in yield_event(event):
             yield msg
-            await asyncio.sleep(0)
+            await asyncio.sleep(0.1)
 
-        # Run keywords task
+        # Run the crew tasks
         crew_result = my_crew.kickoff(inputs={"query": query})
 
-        # Process tasks in sequence with status updates
+        # Process results
         if hasattr(crew_result, 'tasks_output'):
-            tasks_info = {
-                0: ("keywords", "keywords"),
-                1: ("queries", "queries"),
-                2: ("ranking", "ranking")
-            }
-            
             for idx, task_output in enumerate(crew_result.tasks_output):
-                if idx in tasks_info:
-                    task_id, task_name = tasks_info[idx]
-                    
+                if idx == 0:
                     if hasattr(task_output, 'raw'):
-                        # Send task result
-                        event = await process_task_result(task_id, task_output.raw)
+                        event = await process_task_result("keywords", task_output.raw)
                         async for msg in yield_event(event):
                             yield msg
-                            await asyncio.sleep(0)
+                            await asyncio.sleep(0.1)
 
-                    # Send next status update (if not the last task)
-                    if idx < len(tasks_info) - 1:
-                        next_task = tasks_info[idx + 1][1]
-                        event = await create_stream_event(
-                            event_type="status",
-                            message=f"Analyzing {next_task}..."
-                        )
+                    event = await create_stream_event(
+                        event_type="status",
+                        message="Building search queries..."
+                    )
+                    async for msg in yield_event(event):
+                        yield msg
+                        await asyncio.sleep(0.1)
+
+                elif idx == 1:
+                    if hasattr(task_output, 'raw'):
+                        event = await process_task_result("queries", task_output.raw)
                         async for msg in yield_event(event):
                             yield msg
-                            await asyncio.sleep(0)
+                            await asyncio.sleep(0.1)
+
+                    event = await create_stream_event(
+                        event_type="status",
+                        message="Analyzing competitive position..."
+                    )
+                    async for msg in yield_event(event):
+                        yield msg
+                        await asyncio.sleep(0.1)
+
+                elif idx == 2:
+                    if hasattr(task_output, 'raw'):
+                        event = await process_task_result("ranking", task_output.raw)
+                        async for msg in yield_event(event):
+                            yield msg
+                            await asyncio.sleep(0.1)
 
         # Complete
         event = await create_stream_event(
