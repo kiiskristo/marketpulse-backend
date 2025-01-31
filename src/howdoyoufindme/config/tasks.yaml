@@ -36,24 +36,24 @@ ranking_task:
     3. Determine their position
     4. Include context about market leaders and competitive position
 
-    Your response must match this JSON structure:
-    {
+    Your response must match this structure (using braces instead of parentheses):
+    (
       "ranking_position": "#X in [industry]",
-      "market_context": {
+      "market_context": (
         "market_size": "size",
         "growth_projections": "growth"
-      },
-      "comparison_to_leaders": {
+      ),
+      "comparison_to_leaders": (
         "top_competitors": [
-          {
+          (
             "company": "name",
             "rank": 1,
             "market_share": "percent"
-          }
+          )
         ],
         "summary": "analysis"
-      }
-    }
+      )
+    )
   expected_output: >
     Valid JSON matching the specified structure
   agent: ranking_agent
