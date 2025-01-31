@@ -1,23 +1,21 @@
 # src/howdoyoufindme/main.py
 
-import logging
-import sys
+import logging  # Import logging module
+import sys  # Import sys module
+from pythonjsonlogger.json import JsonFormatter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from .utils.task_processor import stream_results
 from .flows.search_rank_flow import SearchRankFlow
 
-# Configure logging to output INFO logs to stdout
-logging.basicConfig(
-    level=logging.INFO,  # Set log level
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout)  # Log to stdout instead of stderr
-    ]
-)
+logHandler = logging.StreamHandler(sys.stdout)
+formatter = JsonFormatter()
+logHandler.setFormatter(formatter)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(logHandler)
 
 app = FastAPI()
 
