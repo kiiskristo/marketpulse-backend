@@ -33,33 +33,28 @@ ranking_task:
     Analyze where '{query}' ranks in their industry:
     1. Review search results for rankings and market position
     2. Compare against identified competitors
-    3. Determine their position (e.g., "ranks #5 in online hearing aid providers")
+    3. Determine their position
     4. Include context about market leaders and competitive position
 
-    IMPORTANT: Return data in this EXACT format (do not add any other fields):
+    Your response must match this JSON structure:
     {
-      "ranking_position": "Company ranks #X in [industry]",
+      "ranking_position": "#X in [industry]",
       "market_context": {
-        "market_size": "Total market size",
-        "growth_projections": "Growth rate"
+        "market_size": "size",
+        "growth_projections": "growth"
       },
       "comparison_to_leaders": {
         "top_competitors": [
           {
-            "company": "Company name",
+            "company": "name",
             "rank": 1,
-            "market_share": "XX%"
+            "market_share": "percent"
           }
         ],
-        "summary": "Brief competitive analysis"
+        "summary": "analysis"
       }
     }
-
-    - Use numbers for ranks (not strings)
-    - Keep market share as percentage strings
-    - Do not add extra fields
-    - Format exactly as shown above
   expected_output: >
-    A JSON object with ranking position, market context, and competitor comparison
+    Valid JSON matching the specified structure
   agent: ranking_agent
   context: [build_query_task]
