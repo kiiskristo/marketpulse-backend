@@ -1,21 +1,12 @@
 # src/howdoyoufindme/main.py
 
-import logging  # Import logging module
-import sys  # Import sys module
-from pythonjsonlogger.json import JsonFormatter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from .utils.task_processor import stream_results
 from .flows.search_rank_flow import SearchRankFlow
-
-logHandler = logging.StreamHandler(stream=sys.stdout)
-formatter = JsonFormatter()
-
-logHandler.setFormatter(formatter)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-logger.addHandler(logHandler)
+from typing import AsyncGenerator
+import asyncio
 
 app = FastAPI()
 
@@ -28,6 +19,13 @@ app.add_middleware(
     expose_headers=["Content-Type", "text/event-stream"]
 )
 
+async def event_generator(query: str) -> AsyncGenerator[str, None]:
+    """Generate SSE events from flow"""
+    flow = SearchRankFlow(query)
+    async for event in flow.stream_analysis():
+        yield event
+        await asyncio.sleep(0)
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
@@ -35,29 +33,27 @@ async def health_check():
 
 @app.get("/api/search-rank/stream")
 async def search_rank_stream(query: str):
-    # Set chunked transfer encoding and disable buffering
     return StreamingResponse(
         stream_results(query),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",  # Disable Nginx buffering
+            "X-Accel-Buffering": "no",
             "Transfer-Encoding": "chunked"
         }
     )
     
 
-# New Flow-based endpoint
 @app.get("/api/search-rank/flow")
 async def search_rank_flow(query: str):
-    flow = SearchRankFlow(query)
     return StreamingResponse(
-        flow.stream_analysis(),
+        event_generator(query),
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache, no-transform",
+            "Cache-Control": "no-cache",
             "Connection": "keep-alive",
+            "Content-Type": "text/event-stream",
             "X-Accel-Buffering": "no",
             "Transfer-Encoding": "chunked"
         }
