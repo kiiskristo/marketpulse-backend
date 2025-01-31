@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from .utils.task_processor import stream_results
+from .flows.search_rank_flow import SearchRankFlow
 
 app = FastAPI()
 
@@ -31,6 +32,22 @@ async def search_rank_stream(query: str):
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",  # Disable Nginx buffering
+            "Transfer-Encoding": "chunked"
+        }
+    )
+    
+
+# New Flow-based endpoint
+@app.get("/api/search-rank/flow")
+async def search_rank_flow(query: str):
+    flow = SearchRankFlow(query)
+    return StreamingResponse(
+        flow.stream_analysis(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
             "Transfer-Encoding": "chunked"
         }
     )
