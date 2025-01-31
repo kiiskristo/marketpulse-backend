@@ -9,10 +9,10 @@ from fastapi.responses import StreamingResponse
 from .utils.task_processor import stream_results
 from .flows.search_rank_flow import SearchRankFlow
 
-logHandler = logging.StreamHandler(sys.stdout)
+logHandler = logging.StreamHandler(stream=sys.stdout)
 formatter = JsonFormatter()
-logHandler.setFormatter(formatter)
 
+logHandler.setFormatter(formatter)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(logHandler)
