@@ -156,3 +156,169 @@ async def test_search_rank_flow_error(mock_agent, mock_task):
             assert events[0]["type"] == "status"
             assert events[1]["type"] == "error"
             assert "Failed to process keywords data" in events[1]["message"]
+
+@pytest.mark.asyncio
+async def test_json_extraction_failures(mock_agent, mock_task):
+    """Test JSON extraction failure cases"""
+    flow = SearchRankFlow(query="test")
+    
+    # Test invalid JSON
+    assert flow._extract_json_from_response('{"invalid": json}') is None
+    
+    # Test empty string
+    assert flow._extract_json_from_response('') is None
+    
+    # Test no JSON content
+    assert flow._extract_json_from_response('no json here') is None
+
+# tests/test_search_rank_flow.py
+
+@pytest.mark.asyncio
+async def test_queries_failure(mock_agent, mock_task, sample_task_responses):
+    """Test failure in queries phase"""
+    with patch('howdoyoufindme.flows.search_rank_flow.HowDoYouFindMeCrew') as MockCrew:
+        # Create different agents for each role
+        keyword_agent = Agent(role="Keyword Agent", goal="Test Goal", backstory="Test Backstory")
+        query_agent = Agent(role="Query Agent", goal="Test Goal", backstory="Test Backstory")
+        ranking_agent = Agent(role="Ranking Agent", goal="Test Goal", backstory="Test Backstory")
+
+        # Setup mock crew instance with different agents
+        mock_crew_instance = MagicMock()
+        mock_crew_instance.keyword_agent.return_value = keyword_agent
+        mock_crew_instance.query_builder_agent.return_value = query_agent
+        mock_crew_instance.ranking_agent.return_value = ranking_agent
+        mock_crew_instance.generate_keywords_task.return_value = mock_task
+        mock_crew_instance.build_query_task.return_value = mock_task
+        mock_crew_instance.ranking_task.return_value = mock_task
+        MockCrew.return_value = mock_crew_instance
+
+        # Create TaskOutput mock with proper structure
+        class MockTaskOutput:
+            def __init__(self, raw_data):
+                self.raw = raw_data
+
+        # Create mock crews
+        mock_keyword_crew = MagicMock()
+        mock_keyword_output = MockTaskOutput(json.dumps(sample_task_responses["keywords"]))
+        mock_keyword_result = MagicMock()
+        mock_keyword_result.tasks_output = [mock_keyword_output]
+        mock_keyword_crew.kickoff.return_value = mock_keyword_result
+
+        mock_query_crew = MagicMock()
+        mock_query_crew.kickoff.side_effect = Exception("Query processing failed")
+
+        with patch('howdoyoufindme.flows.search_rank_flow.Crew') as MockCrewClass:
+            def crew_factory(*args, **kwargs):
+                agents = kwargs.get('agents', [])
+                if not agents:
+                    return MagicMock()
+
+                # Get the first agent from the kwargs
+                current_agent = agents[0]
+                agent_role = current_agent.role
+
+                # Match based on role
+                if agent_role == "Keyword Agent":
+                    return mock_keyword_crew
+                elif agent_role == "Query Agent":
+                    return mock_query_crew
+                
+                return MagicMock()
+
+            MockCrewClass.side_effect = crew_factory
+
+            flow = SearchRankFlow(query="test company")
+
+            events = []
+            async for event in flow.stream_analysis():
+                event_str = event.removeprefix("data: ").removesuffix("\n\n")
+                event_data = json.loads(event_str)
+                events.append(event_data)
+                print(f"\nReceived event: {json.dumps(event_data, indent=2)}")
+
+            # Verify the sequence of events
+            assert len(events) == 4
+            assert events[0] == {"type": "status", "message": "Starting analysis..."}
+            assert events[1]["type"] == "task_complete"
+            assert events[1]["task"] == "keywords"
+            assert events[2] == {"type": "status", "message": "Analyzing queries..."}
+            assert events[3]["type"] == "error"
+            assert events[3]["message"] == "Failed to process queries data"  # Updated assertion
+
+@pytest.mark.asyncio
+async def test_ranking_failure(mock_agent, mock_task, sample_task_responses):
+    """Test failure in ranking phase"""
+    with patch('howdoyoufindme.flows.search_rank_flow.HowDoYouFindMeCrew') as MockCrew:
+        # Setup mock crew instance
+        mock_crew_instance = MagicMock()
+        mock_crew_instance.keyword_agent.return_value = mock_agent
+        mock_crew_instance.query_builder_agent.return_value = mock_agent
+        mock_crew_instance.ranking_agent.return_value = mock_agent
+        mock_crew_instance.generate_keywords_task.return_value = mock_task
+        mock_crew_instance.build_query_task.return_value = mock_task
+        mock_crew_instance.ranking_task.return_value = mock_task
+        MockCrew.return_value = mock_crew_instance
+
+        mock_keyword_crew = MagicMock()
+        mock_keyword_crew.kickoff.return_value = MagicMock(
+            tasks_output=[MagicMock(raw=json.dumps(sample_task_responses["keywords"]))]
+        )
+
+        mock_query_crew = MagicMock()
+        mock_query_crew.kickoff.return_value = MagicMock(
+            tasks_output=[MagicMock(raw=json.dumps(sample_task_responses["queries"]))]
+        )
+
+        mock_ranking_error = MagicMock()
+        mock_ranking_error.kickoff.side_effect = Exception("Ranking processing failed")
+
+        with patch('howdoyoufindme.flows.search_rank_flow.Crew') as MockCrewClass:
+            MockCrewClass.side_effect = [mock_keyword_crew, mock_query_crew, mock_ranking_error]
+            
+            flow = SearchRankFlow(query="test company")
+            
+            events = []
+            async for event in flow.stream_analysis():
+                event_str = event.removeprefix("data: ").removesuffix("\n\n")
+                events.append(json.loads(event_str))
+
+            assert len(events) == 6  # All events up to ranking error
+            assert events[0]["type"] == "status"
+            assert events[1]["type"] == "task_complete"
+            assert events[2]["type"] == "status"
+            assert events[3]["type"] == "task_complete"
+            assert events[4]["type"] == "status"
+            assert events[5]["type"] == "error"
+            assert events[5]["message"] == "Failed to process ranking data"
+
+@pytest.mark.asyncio
+async def test_invalid_json_in_tasks(mock_agent, mock_task):
+    """Test handling of invalid JSON in task outputs"""
+    with patch('howdoyoufindme.flows.search_rank_flow.HowDoYouFindMeCrew') as MockCrew:
+        mock_crew_instance = MagicMock()
+        mock_crew_instance.keyword_agent.return_value = mock_agent
+        mock_crew_instance.generate_keywords_task.return_value = mock_task
+        MockCrew.return_value = mock_crew_instance
+
+        # Create mock crew with invalid JSON output
+        mock_invalid_crew = MagicMock()
+        mock_invalid_crew.kickoff.return_value = MagicMock(
+            tasks_output=[MagicMock(raw='{"invalid": json')]
+        )
+
+        with patch('howdoyoufindme.flows.search_rank_flow.Crew') as MockCrewClass:
+            MockCrewClass.return_value = mock_invalid_crew
+            
+            flow = SearchRankFlow(query="test company")
+            
+            events = []
+            async for event in flow.stream_analysis():
+                event_str = event.removeprefix("data: ").removesuffix("\n\n")
+                events.append(json.loads(event_str))
+
+            # Should get initial status and error for failed JSON parsing
+            assert len(events) == 2
+            assert events[0]["type"] == "status"
+            assert events[1]["type"] == "error"
+            assert "Failed to process keywords data" in events[1]["message"]
+            

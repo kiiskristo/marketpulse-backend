@@ -3,7 +3,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from .utils.task_processor import stream_results
 from .flows.search_rank_flow import SearchRankFlow
 from typing import AsyncGenerator
 import asyncio
@@ -29,20 +28,6 @@ async def event_generator(query: str) -> AsyncGenerator[str, None]:
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
-
-@app.get("/api/search-rank/stream")
-async def search_rank_stream(query: str):
-    return StreamingResponse(
-        stream_results(query),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache, no-transform",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",
-            "Transfer-Encoding": "chunked"
-        }
-    )
     
 
 @app.get("/api/search-rank/flow")
