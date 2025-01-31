@@ -35,23 +35,31 @@ ranking_task:
     2. Compare against identified competitors
     3. Determine their position (e.g., "ranks #5 in online hearing aid providers")
     4. Include context about market leaders and competitive position
-  expected_output: >
+
+    IMPORTANT: Return data in this EXACT format (do not add any other fields):
     {
-      "ranking_position": "Clear ranking statement",
+      "ranking_position": "Company ranks #X in [industry]",
       "market_context": {
         "market_size": "Total market size",
-        "growth_projections": "Growth projections"
+        "growth_projections": "Growth rate"
       },
       "comparison_to_leaders": {
         "top_competitors": [
           {
-            "company": "Competitor name",
-            "rank": "Numeric rank",
-            "market_share": "Market share percentage"
+            "company": "Company name",
+            "rank": 1,
+            "market_share": "XX%"
           }
         ],
-        "summary": "Competitive analysis summary"
+        "summary": "Brief competitive analysis"
       }
     }
+
+    - Use numbers for ranks (not strings)
+    - Keep market share as percentage strings
+    - Do not add extra fields
+    - Format exactly as shown above
+  expected_output: >
+    A JSON object with ranking position, market context, and competitor comparison
   agent: ranking_agent
   context: [build_query_task]
