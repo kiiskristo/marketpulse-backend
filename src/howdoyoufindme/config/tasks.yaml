@@ -4,11 +4,13 @@ generate_keywords_task:
   description: >
     For the company or website '{query}':
     1. Identify their primary industry/category
-    2. List their main competitors in this space
-    3. Generate keywords that define this market segment
+    2. Identify their location if they are physical company, do not for online
+    3. List their main competitors in this space or location if physical 
+    4. Generate keywords that define this market segment
   expected_output: >
     {
       "category": "Industry category",
+      "location": "City, State"
       "competitors": ["List of main competitors"],
       "keywords": ["List of relevant keywords"]
     }
@@ -16,14 +18,18 @@ generate_keywords_task:
 
 build_query_task:
   description: >
-    Use the category and competitor information to:
-    1. Create search queries to find industry rankings and market positions
-    2. Search for authoritative sources that rank companies in this space
-    3. Gather competitive positioning data
+    Using the business context and location if physical:
+    1. For physical businesses, create location-aware search queries
+    2. For online businesses, create broader market queries
+    3. Search for authoritative sources that rank companies in the appropriate scope
+    4. Gather competitive positioning data relative to context
   expected_output: >
     {
-      "queries": ["List of search queries used"],
-      "results": ["List of search results and findings"]
+      "queries": {
+        "location_specific": ["Queries with location if physical"],
+        "market_general": ["General market queries"],
+        "results": ["Findings from searches"]
+      }
     }
   agent: query_builder_agent
   context: [generate_keywords_task]
@@ -31,14 +37,14 @@ build_query_task:
 ranking_task:
   description: >
     Analyze where '{query}' ranks in their industry:
-    1. Review search results for rankings and market position
-    2. Compare against identified competitors
-    3. Determine their position
-    4. Include context about market leaders and competitive position
+    1. For physical businesses, focus on local/regional position
+    2. For online businesses, analyze broader market position
+    3. Compare against identified competitors in relevant scope
+    4. Provide market context appropriate to business type
 
     Your response must match this structure (using braces instead of parentheses):
     (
-      "ranking_position": "#X in [industry]",
+     "ranking_position": "#X in [industry/location]",
       "market_context": (
         "market_size": "size",
         "growth_projections": "growth"
