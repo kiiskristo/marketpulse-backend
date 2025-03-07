@@ -16,6 +16,7 @@ First, if you haven't already, install uv:
 pip install uv
 ```
 
+
 Next, navigate to your project directory and install the dependencies:
 
 (Optional) Lock the dependencies and install them by using the CLI command:
