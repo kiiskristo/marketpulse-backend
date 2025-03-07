@@ -12,6 +12,7 @@ Ensure you have Python >=3.10 <3.13 installed on your system. This project uses 
 
 First, if you haven't already, install uv:
 
+
 ```bash
 pip install uv
 ```
