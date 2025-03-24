@@ -1,3 +1,6 @@
+import logging
+logging.getLogger('opentelemetry.trace').setLevel(logging.ERROR)
+
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
@@ -51,6 +54,9 @@ class FinancialNewsSearchTool(BaseTool):
         try:
             results = self.bing_search.run(f"financial news {query}")
             
+            # Create logs directory if it doesn't exist
+            os.makedirs(".logs", exist_ok=True)
+            
             # Log usage
             with open(".logs/bing_usage.log", "a") as log:
                 log.write(f"{datetime.now().isoformat()},query,{query}\n")
@@ -103,6 +109,13 @@ class StockQuoteTool(BaseTool):
             
             response = requests.get(url)
             data = response.json()
+            
+            # Create logs directory if it doesn't exist
+            os.makedirs(".logs", exist_ok=True)
+            
+            # Log usage
+            with open(".logs/alphavantage_usage.log", "a") as log:
+                log.write(f"{datetime.now().isoformat()},quote,{symbol}\n")
             
             # Format the response
             if "Global Quote" in data and data["Global Quote"]:
@@ -173,6 +186,13 @@ class InfluencerMonitorTool(BaseTool):
             # Craft a query focused on recent statements/actions with market impact
             query = f"{person} recent statement market finance economy (site:cnbc.com OR site:bloomberg.com OR site:reuters.com OR site:ft.com OR site:wsj.com)"
             results = self.bing_search.run(query)
+            
+            # Create logs directory if it doesn't exist
+            os.makedirs(".logs", exist_ok=True)
+            
+            # Log usage
+            with open(".logs/bing_usage.log", "a") as log:
+                log.write(f"{datetime.now().isoformat()},influencer,{person}\n")
             
             # Cache the results
             with open(cache_file, 'w') as f:

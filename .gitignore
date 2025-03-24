@@ -13,3 +13,7 @@ dist/
 
 # Lock files (if auto-generated and not needed in repo)
 uv.lock
+
+# Cache and logs
+.cache/
+.logs/

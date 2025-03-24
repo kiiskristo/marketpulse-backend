@@ -53,7 +53,7 @@ class MarketSentimentCrew:
         return Agent(
             config=self.agents_config['portfolio_strategy_agent'],
             tools=[self.stock_tool],
-            llm_config={"temperature": 0.2, "model": "gpt-4o-mini"},
+            llm_config={"temperature": 0.7, "model": "gpt-4o-mini"},
             verbose=True
         )
 
