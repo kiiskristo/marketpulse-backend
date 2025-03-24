@@ -1,58 +1,120 @@
-# HowdoyoufindmeBackend Crew
+# Market Sentiment Analysis System
 
-[![Tests](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/main.yml/badge.svg)](https://github.com/kiiskristo/howdoyoufindme-backend/actions/workflows/main.yml)
+An automated system that analyzes financial news, market data, and influencer statements to provide personalized trading recommendations based on market sentiment.
 
-[![codecov](https://codecov.io/gh/kiiskristo/howdoyoufindme-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/kiiskristo/howdoyoufindme-backend)
+## Features
 
-Welcome to the HowdoyoufindmeBackend Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+- **Multi-Agent Architecture**: Leverages crewAI to orchestrate specialized agents for different aspects of market analysis
+- **Daily Sentiment Analysis**: Collects and analyzes global financial news, company-specific developments, and key influencer statements
+- **Portfolio-Aware Recommendations**: Generates trading recommendations tailored to user's portfolio and preferences
+- **Caching System**: Efficiently reuses API responses to minimize costs
+- **API & CLI Interfaces**: Access via RESTful API or command line
 
-## Installation
+## Setup Instructions
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
-First, if you haven't already, install uv:
-
-```bash
-pip install uv
-```
-
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/howdoyoufindme_backend/config/agents.yaml` to define your agents
-- Modify `src/howdoyoufindme_backend/config/tasks.yaml` to define your tasks
-- Modify `src/howdoyoufindme_backend/crew.py` to add your own logic, tools and specific args
-- Modify `src/howdoyoufindme_backend/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+### 1. Install Dependencies
 
 ```bash
-$ crewai run
+# Clone the repository
+git clone https://github.com/yourusername/market-sentiment.git
+cd market-sentiment
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-This command initializes the howdoyoufindme-backend Crew, assembling the agents and assigning them tasks as defined in your configuration.
+### 2. Configure Environment Variables
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```bash
+# Copy the environment template
+cp .env.template .env
 
-## Understanding Your Crew
+# Edit .env and add your API keys
+# You'll need:
+# - OpenAI API key
+# - Bing Search API key
+# - Alpha Vantage API key
+```
 
-The howdoyoufindme-backend Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+### 3. Create Portfolio and Preferences Files
 
-## Support
+See examples in the `examples/` directory:
+- `portfolio.json`: Your stock holdings
+- `preferences.json`: Your investment preferences
 
-For support, questions, or feedback regarding the HowdoyoufindmeBackend Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+### 4. Running the Application
 
-Let's create wonders together with the power and simplicity of crewAI.
+#### Via CLI:
+
+```bash
+# Run a one-time analysis
+python -m src.market_sentiment.cli --portfolio examples/portfolio.json --preferences examples/preferences.json --output analysis.json
+```
+
+#### As a Web Service:
+
+```bash
+# Start the API server
+python app.py
+
+# The API will be available at:
+# http://localhost:8000/api/sentiment/analyze (POST)
+# http://localhost:8000/api/sentiment/demo (GET)
+```
+
+## API Usage
+
+### Analyze Portfolio Sentiment
+
+```bash
+curl -X POST http://localhost:8000/api/sentiment/analyze \
+  -H "Content-Type: application/json" \
+  -d @examples/request.json
+```
+
+Where `request.json` contains:
+
+```json
+{
+  "portfolio": {
+    "holdings": [
+      {"ticker": "AAPL", "company": "Apple Inc.", "allocation": 15, "sector": "Technology"}
+    ]
+  },
+  "preferences": {
+    "risk_tolerance": "moderate",
+    "preferred_sectors": ["Technology"],
+    "preferred_regions": ["US"],
+    "investment_horizon": "medium-term"
+  }
+}
+```
+
+## Deployment
+
+The application is designed to be deployed on Railway or similar platforms:
+
+```bash
+# Deploy to Railway
+railway up
+```
+
+## Cost Optimization
+
+The system uses several cost-optimization strategies:
+
+1. **Intelligent Caching**: API responses are cached to avoid redundant calls
+2. **Shared Global Analysis**: Market-wide data is shared among all users
+3. **GPT-4o-mini**: Uses efficient LLM to minimize token costs
+4. **Scheduled Execution**: Runs only during market days
+
+## Future Enhancements
+
+- Interactive Brokers integration for automated trading
+- Email delivery of daily recommendations
+- User dashboard for tracking recommendation performance
+- Custom news source integrations

@@ -1,0 +1,21 @@
+{
+    "risk_tolerance": "moderate",
+    "preferred_sectors": ["Technology", "Healthcare", "Consumer Staples"],
+    "preferred_regions": ["US", "Europe"],
+    "investment_horizon": "medium-term",
+    "max_position_size": 20,
+    "min_position_size": 3,
+    "allow_short_positions": true,
+    "allow_options": false,
+    "rebalance_frequency": "monthly",
+    "market_view": {
+      "economy": "cautiously_optimistic",
+      "inflation": "concerned",
+      "interest_rates": "stable"
+    },
+    "esg_preferences": {
+      "environmental": "moderate",
+      "social": "moderate",
+      "governance": "high"
+    }
+  }

@@ -1,0 +1,150 @@
+# src/market_sentiment/config/tasks.yaml
+
+collect_global_news_task:
+  description: >
+    Analyze today's global financial news:
+    1. Identify major market-moving events in the last 24 hours
+    2. Highlight key economic data releases and their implications
+    3. Track central bank statements or policy changes
+    4. Note significant geopolitical developments affecting markets
+    5. Identify emerging market trends or sector rotations
+  expected_output: >
+    {
+      "major_events": [
+        {"event": "Event description", "potential_impact": "Impact description"}
+      ],
+      "economic_data": [
+        {"indicator": "Indicator name", "actual": "value", "expected": "value", "impact": "Impact description"}
+      ],
+      "central_bank_actions": [
+        {"bank": "Bank name", "action": "Action taken", "market_reaction": "Reaction description"}
+      ],
+      "geopolitical_developments": [
+        {"development": "Development description", "affected_markets": ["markets"], "potential_impact": "Impact description"}
+      ],
+      "market_trends": [
+        {"trend": "Trend description", "affected_sectors": ["sectors"]}
+      ]
+    }
+  agent: global_news_agent
+
+analyze_portfolio_news_task:
+  description: >
+    For the portfolio containing {portfolio}, analyze recent company-specific news:
+    1. Identify significant news for each holding in the portfolio
+    2. Note any earnings reports, guidance updates, or analyst rating changes
+    3. Track management changes, product launches, or legal developments
+    4. Identify sector-specific trends affecting portfolio companies
+    5. Look for unusual trading activity or sentiment shifts
+  expected_output: >
+    {
+      "company_news": [
+        {
+          "ticker": "SYMBOL",
+          "company": "Company Name",
+          "news_items": [
+            {"headline": "News headline", "source": "Source", "date": "Date", "sentiment": "positive/negative/neutral"}
+          ],
+          "overall_sentiment": "positive/negative/neutral"
+        }
+      ],
+      "sector_news": [
+        {
+          "sector": "Sector name",
+          "developments": [
+            {"development": "Development description", "impact": "Impact on portfolio"}
+          ]
+        }
+      ]
+    }
+  agent: portfolio_news_agent
+
+monitor_key_influencers_task:
+  description: >
+    Monitor statements from market-moving individuals and institutions:
+    1. Track recent statements from key figures (Musk, Trump, central bankers, etc.)
+    2. Identify new regulatory announcements or government policies
+    3. Note statements from prominent investors or analysts
+    4. Assess how these statements might affect market sentiment
+  expected_output: >
+    {
+      "influencer_statements": [
+        {
+          "person": "Person name",
+          "position": "Their role",
+          "statement": "What they said",
+          "date": "When they said it",
+          "market_relevance": "How it might affect markets",
+          "affected_sectors": ["sectors"]
+        }
+      ],
+      "regulatory_announcements": [
+        {
+          "regulator": "Regulatory body",
+          "announcement": "Announcement details",
+          "affected_industries": ["industries"],
+          "potential_impact": "Potential market impact"
+        }
+      ]
+    }
+  agent: influencer_monitor_agent
+
+analyze_market_sentiment_task:
+  description: >
+    Synthesize all collected information to determine overall market sentiment:
+    1. Analyze global news, portfolio-specific news, and influencer statements
+    2. Identify the strongest signals affecting market direction
+    3. Determine sentiment for various market sectors and regions
+    4. Spot potential opportunities or risks based on sentiment analysis
+    5. Consider contrarian indicators or overlooked developments
+  expected_output: >
+    {
+      "overall_market_sentiment": "bullish/bearish/neutral",
+      "sentiment_rationale": "Explanation of sentiment assessment",
+      "sector_sentiment": [
+        {"sector": "Sector name", "sentiment": "bullish/bearish/neutral", "rationale": "Rationale"}
+      ],
+      "regional_sentiment": [
+        {"region": "Region name", "sentiment": "bullish/bearish/neutral", "rationale": "Rationale"}
+      ],
+      "potential_opportunities": [
+        {"opportunity": "Opportunity description", "confidence": "high/medium/low"}
+      ],
+      "potential_risks": [
+        {"risk": "Risk description", "likelihood": "high/medium/low", "potential_impact": "high/medium/low"}
+      ]
+    }
+  agent: sentiment_analysis_agent
+  context: [collect_global_news_task, analyze_portfolio_news_task, monitor_key_influencers_task]
+
+generate_recommendations_task:
+  description: >
+    Based on market sentiment analysis and the user's portfolio {portfolio} with preferences {preferences}:
+    1. Generate specific trading recommendations (buy, sell, hold)
+    2. Consider user's risk profile, regional/sector preferences
+    3. Provide position sizing recommendations
+    4. Explain rationale for each recommendation
+    5. Consider any hedging strategies if appropriate
+  expected_output: >
+    {
+      "trading_recommendations": [
+        {
+          "action": "buy/sell/hold",
+          "ticker": "SYMBOL",
+          "company": "Company Name",
+          "confidence": "high/medium/low",
+          "position_size": "Percentage of portfolio",
+          "rationale": "Detailed explanation for recommendation",
+          "risk_assessment": "Risk level assessment"
+        }
+      ],
+      "portfolio_adjustments": [
+        {"adjustment": "Adjustment description", "rationale": "Rationale"}
+      ],
+      "hedging_strategies": [
+        {"strategy": "Strategy description", "implementation": "How to implement"}
+      ],
+      "summary": "Overall recommendation summary"
+    }
+  agent: portfolio_strategy_agent
+  context: [analyze_market_sentiment_task]

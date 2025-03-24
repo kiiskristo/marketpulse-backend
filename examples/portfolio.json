@@ -1,0 +1,84 @@
+{
+    "holdings": [
+      {
+        "ticker": "AAPL",
+        "company": "Apple Inc.",
+        "allocation": 15,
+        "sector": "Technology",
+        "purchase_price": 168.25,
+        "shares": 25
+      },
+      {
+        "ticker": "MSFT",
+        "company": "Microsoft Corp.",
+        "allocation": 12,
+        "sector": "Technology",
+        "purchase_price": 325.50,
+        "shares": 10
+      },
+      {
+        "ticker": "AMZN",
+        "company": "Amazon.com Inc.",
+        "allocation": 10,
+        "sector": "Consumer Discretionary",
+        "purchase_price": 132.15,
+        "shares": 20
+      },
+      {
+        "ticker": "NVDA",
+        "company": "NVIDIA Corp.",
+        "allocation": 8,
+        "sector": "Technology",
+        "purchase_price": 445.75,
+        "shares": 5
+      },
+      {
+        "ticker": "GOOGL",
+        "company": "Alphabet Inc.",
+        "allocation": 8,
+        "sector": "Communication Services",
+        "purchase_price": 135.60,
+        "shares": 15
+      },
+      {
+        "ticker": "TSLA",
+        "company": "Tesla Inc.",
+        "allocation": 5,
+        "sector": "Consumer Discretionary",
+        "purchase_price": 225.40,
+        "shares": 6
+      },
+      {
+        "ticker": "XOM",
+        "company": "Exxon Mobil Corp.",
+        "allocation": 7,
+        "sector": "Energy",
+        "purchase_price": 105.80,
+        "shares": 18
+      },
+      {
+        "ticker": "JNJ",
+        "company": "Johnson & Johnson",
+        "allocation": 6,
+        "sector": "Healthcare",
+        "purchase_price": 155.30,
+        "shares": 10
+      },
+      {
+        "ticker": "JPM",
+        "company": "JPMorgan Chase & Co.",
+        "allocation": 5,
+        "sector": "Financials",
+        "purchase_price": 142.75,
+        "shares": 9
+      },
+      {
+        "ticker": "PG",
+        "company": "Procter & Gamble Co.",
+        "allocation": 4,
+        "sector": "Consumer Staples",
+        "purchase_price": 150.20,
+        "shares": 7
+      }
+    ]
+  }
