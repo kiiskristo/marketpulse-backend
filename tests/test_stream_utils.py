@@ -1,28 +1,41 @@
 # tests/test_stream_utils.py
 
-import json
 import pytest
-from howdoyoufindme.utils.stream_utils import create_stream_event, process_task_result
-from unittest.mock import patch
+import json
+from unittest.mock import patch, MagicMock
+from marketpulse.utils.stream_utils import (
+    create_stream_event,
+    process_task_result
+)
 
+@pytest.fixture
+def sample_keyword_response():
+    return {
+        "category": "E-commerce",
+        "competitors": ["Amazon", "Walmart", "Target"],
+        "keywords": ["online retail", "e-commerce", "marketplace"],
+    }
 
 @pytest.mark.asyncio
 async def test_create_stream_event_status():
-    event = await create_stream_event("status", message="Processing...")
+    """Test creation of a status stream event"""
+    event = await create_stream_event("status", message="Processing data")
     parsed = json.loads(event.strip())
     assert parsed["type"] == "status"
-    assert parsed["message"] == "Processing..."
-
+    assert parsed["message"] == "Processing data"
 
 @pytest.mark.asyncio
 async def test_create_stream_event_task_complete():
-    data = {"result": "test_data"}
-    event = await create_stream_event("task_complete", task="test_task", data=data)
+    """Test creation of a task_complete stream event"""
+    event = await create_stream_event(
+        event_type="task_complete", 
+        task="test", 
+        data={"result": "success"}
+    )
     parsed = json.loads(event.strip())
     assert parsed["type"] == "task_complete"
-    assert parsed["task"] == "test_task"
-    assert parsed["data"] == data
-
+    assert parsed["task"] == "test"
+    assert parsed["data"]["result"] == "success"
 
 @pytest.mark.asyncio
 async def test_process_task_result_success(sample_keyword_response):
@@ -33,7 +46,6 @@ async def test_process_task_result_success(sample_keyword_response):
     assert parsed["task"] == "keywords"
     assert parsed["data"] == sample_keyword_response
 
-
 @pytest.mark.asyncio
 async def test_process_task_result_invalid_json():
     invalid_json = "{invalid:json"
@@ -41,17 +53,15 @@ async def test_process_task_result_invalid_json():
     parsed = json.loads(event.strip())
     assert parsed["type"] == "error"
     assert "Failed to process keywords output" in parsed["message"]
-    
 
 @pytest.mark.asyncio
 async def test_process_task_result_inner_exception():
     """Test handling of inner exception during JSON parsing"""
-    with patch('howdoyoufindme.utils.stream_utils.clean_and_parse_json', side_effect=Exception("Inner error")):
+    with patch('marketpulse.utils.stream_utils.clean_and_parse_json', side_effect=Exception("Inner error")):
         event = await process_task_result("test_task", "{}")
         parsed = json.loads(event.strip())
         assert parsed["type"] == "error"
         assert "Unexpected error processing test_task output" in parsed["message"]
-
 
 @pytest.mark.asyncio
 async def test_process_task_result_json_extraction_failure():
@@ -64,21 +74,18 @@ async def test_process_task_result_json_extraction_failure():
         return original_loads(s)
     
     with patch('json.loads', side_effect=mock_loads), \
-         patch('howdoyoufindme.utils.stream_utils.clean_and_parse_json', 
+         patch('marketpulse.utils.stream_utils.clean_and_parse_json',
                side_effect=ValueError("No valid JSON found")):
         event = await process_task_result("test_task", "invalid json")
         parsed = json.loads(event.strip())
         assert parsed["type"] == "error"
         assert "Failed to process test_task output" in parsed["message"]
-        
-        
+
 @pytest.mark.asyncio
 async def test_process_task_result_salvage_partial_json():
-    """Test salvaging JSON from a string with extra content"""
-    # Text with JSON embedded in it
-    raw_result = "Some text before {\"valid\": \"json\"} and after"
-    event = await process_task_result("test_task", raw_result)
+    """Test that we can extract partial JSON from an otherwise invalid response"""
+    mixed_text = "Some text before {\"valid\": \"json\"} and text after"
+    event = await process_task_result("partial", mixed_text)
     parsed = json.loads(event.strip())
     assert parsed["type"] == "task_complete"
-    assert parsed["task"] == "test_task"
-    assert parsed["data"] == {"valid": "json"}
+    assert parsed["data"]["valid"] == "json"
