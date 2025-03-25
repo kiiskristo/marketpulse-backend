@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "howdoyoufindme"
+name = "marketpulse"
 version = "0.1.0"
-description = "HowDoYouFindMe Backend"
+description = "MarketPulse Backend"
 requires-python = ">=3.12"
 dependencies = [
     "crewai",
@@ -17,6 +17,9 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "pydantic>=2.5.2"
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/marketpulse"]
 
 [tool.pytest.ini_options]
 addopts = "-v"
@@ -34,9 +37,9 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["howdoyoufindme"]
+source = ["marketpulse"]
 omit = [
-    "src/howdoyoufindme/cli.py",
+    "src/marketpulse/cli.py",
     "*/__init__.py",
     "tests/*"
 ]
