@@ -1,7 +1,6 @@
 import streamlit as st
 from marketpulse.crew import MarketSentimentCrew
 
-
 class MarketPulseGUI:
 
     def load_html_template(self):
@@ -75,7 +74,7 @@ class MarketPulseGUI:
 
         self.sidebar()
 
-        self.marketpulseeration()
+        self.newsletter_generation()
 
 
 if __name__ == "__main__":
