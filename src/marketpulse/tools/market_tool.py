@@ -4,7 +4,7 @@ logging.getLogger('opentelemetry.trace').setLevel(logging.ERROR)
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
-from langchain_community.utilities import BingSearchAPIWrapper
+from langchain_community.utilities import GoogleSerperAPIWrapper
 import os
 import requests
 from datetime import datetime, timedelta
@@ -25,14 +25,11 @@ class FinancialNewsSearchTool(BaseTool):
         "and market trends from financial news sources."
     )
     args_schema: Type[BaseModel] = NewsSearchInput
-    bing_search: BingSearchAPIWrapper = None
+    search_wrapper: GoogleSerperAPIWrapper = None
 
     def __init__(self):
         super().__init__()
-        self.bing_search = BingSearchAPIWrapper(
-            bing_subscription_key=os.getenv('BING_SUBSCRIPTION_KEY'),
-            bing_search_url="https://api.bing.microsoft.com/v7.0/search"
-        )
+        self.search_wrapper = GoogleSerperAPIWrapper(serper_api_key=os.getenv('SERPER_API_KEY'))
 
     def _run(self, query: str) -> str:
         """Run the tool with caching and usage tracking"""
@@ -52,13 +49,13 @@ class FinancialNewsSearchTool(BaseTool):
         
         # If no cache or cache is old, make the actual API call
         try:
-            results = self.bing_search.run(f"financial news {query}")
+            results = self.search_wrapper.run(f"financial news {query}")
             
             # Create logs directory if it doesn't exist
             os.makedirs(".logs", exist_ok=True)
             
             # Log usage
-            with open(".logs/bing_usage.log", "a") as log:
+            with open(".logs/serper_usage.log", "a") as log:
                 log.write(f"{datetime.now().isoformat()},query,{query}\n")
             
             # Cache the results
@@ -156,14 +153,11 @@ class InfluencerMonitorTool(BaseTool):
         "like Elon Musk, Jerome Powell, business leaders, or government officials."
     )
     args_schema: Type[BaseModel] = InfluencerMonitorInput
-    bing_search: BingSearchAPIWrapper = None
+    search_wrapper: GoogleSerperAPIWrapper = None
 
     def __init__(self):
         super().__init__()
-        self.bing_search = BingSearchAPIWrapper(
-            bing_subscription_key=os.getenv('BING_SUBSCRIPTION_KEY'),
-            bing_search_url="https://api.bing.microsoft.com/v7.0/search"
-        )
+        self.search_wrapper = GoogleSerperAPIWrapper(serper_api_key=os.getenv('SERPER_API_KEY'))
 
     def _run(self, person: str) -> str:
         """Run the tool with caching mechanism"""
@@ -185,13 +179,13 @@ class InfluencerMonitorTool(BaseTool):
         try:
             # Craft a query focused on recent statements/actions with market impact
             query = f"{person} recent statement market finance economy (site:cnbc.com OR site:bloomberg.com OR site:reuters.com OR site:ft.com OR site:wsj.com)"
-            results = self.bing_search.run(query)
+            results = self.search_wrapper.run(query)
             
             # Create logs directory if it doesn't exist
             os.makedirs(".logs", exist_ok=True)
             
             # Log usage
-            with open(".logs/bing_usage.log", "a") as log:
+            with open(".logs/serper_usage.log", "a") as log:
                 log.write(f"{datetime.now().isoformat()},influencer,{person}\n")
             
             # Cache the results
